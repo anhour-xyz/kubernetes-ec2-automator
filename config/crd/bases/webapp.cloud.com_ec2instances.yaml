@@ -1,0 +1,73 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.21.0
+  name: ec2instances.webapp.cloud.com
+spec:
+  group: webapp.cloud.com
+  names:
+    kind: EC2Instance
+    listKind: EC2InstanceList
+    plural: ec2instances
+    singular: ec2instance
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: EC2Instance is the Schema for the EC2 instances API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: EC2InstanceSpec defines the desired state of an EC2 instance.
+            properties:
+              amiID:
+                type: string
+              department:
+                type: string
+              foo:
+                type: string
+              project:
+                type: string
+              sshKey:
+                type: string
+              type:
+                type: string
+            type: object
+          status:
+            description: EC2InstanceStatus defines the observed state of an EC2 instance.
+            properties:
+              instanceID:
+                type: string
+              phase:
+                type: string
+              publicIP:
+                type: string
+            type: object
+        required:
+        - metadata
+        - spec
+        - status
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

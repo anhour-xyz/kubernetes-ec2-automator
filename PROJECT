@@ -1,0 +1,18 @@
+
+cliVersion: 4.15.0
+domain: cloud.com
+layout:
+- go.kubebuilder.io/v4
+projectName: operator
+repo: github.com/anhour-xyz/kubernetes-ec2-automator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: cloud.com
+  group: webapp
+  kind: EC2Instance
+  path: github.com/anhour-xyz/kubernetes-ec2-automator/api/v1
+  version: v1
+version: "3"
