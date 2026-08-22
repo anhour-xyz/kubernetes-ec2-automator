@@ -10,12 +10,19 @@ import (
 
 // EC2InstanceSpec defines the desired state of an EC2 instance.
 type EC2InstanceSpec struct {
-	Foo        *string `json:"foo,omitempty"`
-	AmiID      string  `json:"amiID,omitempty"`
-	SshKey     string  `json:"sshKey,omitempty"`
-	Type       string  `json:"type,omitempty"`
-	Department string  `json:"department,omitempty"`
-	Project    string  `json:"project,omitempty"`
+	AmiID             string            `json:"amiID,omitempty"`
+	SshKey            string            `json:"sshKey,omitempty"`
+	InstanceType      string            `json:"instanceType,omitempty"`
+	Subnet            string            `json:"subnet,omitempty"`
+	Tags              map[string]string `json:"tags,omitempty"`
+	Storage           StorageConfig     `json:"storage,omitempty"`
+	AdditionalStorage []StorageConfig   `json:"additionalStorage,omitempty"`
+	InstanceName      string            `json:"instanceName"`
+}
+
+type StorageConfig struct {
+	Size int    `json:"size"`
+	Type string `json:"type,omitempty"`
 }
 
 // EC2InstanceStatus defines the observed state of an EC2 instance.
@@ -33,7 +40,7 @@ type EC2Instance struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitzero"`
 	Spec              EC2InstanceSpec   `json:"spec"`
-	Status            EC2InstanceStatus `json:"status,omitzero"`
+	Status            EC2InstanceStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true

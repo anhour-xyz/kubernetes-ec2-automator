@@ -1,17 +1,98 @@
-# Kubernetes EC2 Automator
+# Kubernetes EC2 Infrastructure Operator ☁️
 
 ## Overview
 
+Kubernetes EC2 Automator is a Kubernetes Operator that creates, monitors, and deletes AWS EC2 instances through Kubernetes custom resources. It solves the problem of managing EC2 infrastructure separately from Kubernetes by providing a single declarative, Kubernetes-native workflow.
+Users define the desired EC2 configuration in an EC2Instance resource, and the controller automatically reconciles it with AWS while reporting the instance status back to Kubernetes.
+
+<br>
+
+<ins> Tech Stack: Go, Kubernetes, Docker, Prometheus, Linux, AWS EC2 </ins>
+
+<br>
+
+## Infrastructure Architecture
+
+```text
+                         Developer
+                             │
+              kubectl apply -f ec2instance.yaml
+                             │
+                             ▼
+                ┌──────────────────────┐
+                │ Kubernetes API Server│
+                │                      │
+                │ • Validate CRD       │
+                │ • Authentication/RBAC│
+                └──────────┬───────────┘
+                           │
+                           ▼
+                      ┌────────┐
+                      │  etcd  │
+                      │        │
+                      │ spec   │
+                      │ status │
+                      └────┬───┘
+                           │
+                     Watch Event
+                           │
+                           ▼
+        ┌──────────────────────────────────┐
+        │      EC2Instance Controller      │
+        │        Go + Kubebuilder          │
+        │                                  │
+        │       Reconciliation Loop        │
+        │                                  │
+        │  1. Read desired state           │
+        │  2. Query actual AWS state       │
+        │  3. Compare states               │
+        │  4. Execute required action      │
+        │  5. Update resource status       │
+        └───────────────┬──────────────────┘
+                        │
+                   AWS SDK for Go
+                        │
+                        ▼
+              ┌─────────────────────┐
+              │      AWS EC2 API    │
+              │                     │
+              │ • RunInstances      │
+              │ • DescribeInstances │
+              │ • TerminateInstances│
+              └──────────┬──────────┘
+                         │
+                         ▼
+                  ┌─────────────┐
+                  │EC2 Instances│
+                  └──────┬──────┘
+                         │
+                   Actual State
+                         │
+                         ▼
+              ┌────────────────────┐
+              │ Status Sync        │
+              │                    │
+              │ instanceId         │
+              │ state              │
+              │ IP / conditions    │
+              └─────────┬──────────┘
+                        │
+                        └──────────────► Kubernetes API
 
 
-## Tech Stack
-- go version v1.24.6+
-- docker version 17.03+.
-- kubectl version v1.11.3+.
-- Prometheus
-- Linux 
+        ───────── Supporting Infrastructure ─────────
 
-## System Architecture
+        Reliability                 Observability
+        • Idempotency               • Prometheus
+        • Finalizers                • Metrics
+        • Retry / Backoff           • Logs
+        • Error Handling            • Health Checks
+
+                       Security
+                    • Kubernetes RBAC
+                    • AWS IAM
+
+```
 
 
 

@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -27,10 +26,26 @@ type EC2InstanceReconciler struct {
 // the EC2Instance object against the actual cluster state, and then
 // perform operations to make the cluster state reflect the state specified by
 // the user.
-func (r *EC2InstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = logf.FromContext(ctx)
+func (r *EC2InstanceReconciler) Reconcile(
+	ctx context.Context,
+	req ctrl.Request,
+) (ctrl.Result, error) {
+	l := logf.FromContext(ctx)
 
-	// TODO(user): your logic here
+	ec2Instance := &webappv1.EC2Instance{}
+	if err := r.Get(
+		ctx,
+		req.NamespacedName,
+		ec2Instance,
+	); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	l.Info(
+		"Reconciling EC2Instance",
+		"name", ec2Instance.Name,
+		"namespace", ec2Instance.Namespace,
+	)
 
 	return ctrl.Result{}, nil
 }

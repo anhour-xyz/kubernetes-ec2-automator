@@ -39,18 +39,42 @@ spec:
           spec:
             description: EC2InstanceSpec defines the desired state of an EC2 instance.
             properties:
+              additionalStorage:
+                items:
+                  properties:
+                    size:
+                      type: integer
+                    type:
+                      type: string
+                  required:
+                  - size
+                  type: object
+                type: array
               amiID:
                 type: string
-              department:
+              instanceName:
                 type: string
-              foo:
-                type: string
-              project:
+              instanceType:
                 type: string
               sshKey:
                 type: string
-              type:
+              storage:
+                properties:
+                  size:
+                    type: integer
+                  type:
+                    type: string
+                required:
+                - size
+                type: object
+              subnet:
                 type: string
+              tags:
+                additionalProperties:
+                  type: string
+                type: object
+            required:
+            - instanceName
             type: object
           status:
             description: EC2InstanceStatus defines the observed state of an EC2 instance.
@@ -65,7 +89,6 @@ spec:
         required:
         - metadata
         - spec
-        - status
         type: object
     served: true
     storage: true
