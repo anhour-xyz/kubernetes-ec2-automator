@@ -94,5 +94,13 @@ Users define the desired EC2 configuration in an EC2Instance resource, and the c
 
 ```
 
+## Output
+
+![AWS EC2 Infrastructure Provisioned and Health-Validated](image.png)
+
+1. Developed a Go Kubernetes operator that provisions AWS EC2 instances and synchronizes their instance ID, health state, and network information into custom-resource status.
+
+
+
 
 

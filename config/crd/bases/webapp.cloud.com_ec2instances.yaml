@@ -56,6 +56,8 @@ spec:
                 type: string
               instanceType:
                 type: string
+              region:
+                type: string
               sshKey:
                 type: string
               storage:
@@ -74,7 +76,9 @@ spec:
                   type: string
                 type: object
             required:
+            - amiID
             - instanceName
+            - region
             type: object
           status:
             description: EC2InstanceStatus defines the observed state of an EC2 instance.

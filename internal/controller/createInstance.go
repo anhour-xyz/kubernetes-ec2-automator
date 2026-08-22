@@ -26,13 +26,15 @@ func createEC2Instance(
 	if err != nil {
 		return "", err
 	}
+
 	runInput := &ec2.RunInstancesInput{
-		ImageId:      aws.String(ec2Instance.Spec.AmiID),
-		InstanceType: ec2types.InstanceType(ec2Instance.Spec.InstanceType),
-		KeyName:      aws.String(ec2Instance.Spec.SshKey),
-		SubnetId:     aws.String(ec2Instance.Spec.Subnet),
-		MinCount:     aws.Int32(1),
-		MaxCount:     aws.Int32(1),
+		ClientToken: aws.String(string(ec2Instance.UID)),
+		ImageId:     aws.String(ec2Instance.Spec.AmiID),
+		InstanceType: ec2types.InstanceType(
+			ec2Instance.Spec.InstanceType,
+		),
+		MinCount: aws.Int32(1),
+		MaxCount: aws.Int32(1),
 	}
 
 	result, err := ec2Client.RunInstances(ctx, runInput)

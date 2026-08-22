@@ -5,12 +5,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // EC2InstanceSpec defines the desired state of an EC2 instance.
 type EC2InstanceSpec struct {
-	AmiID             string            `json:"amiID,omitempty"`
+	AmiID             string            `json:"amiID"`
 	SshKey            string            `json:"sshKey,omitempty"`
 	InstanceType      string            `json:"instanceType,omitempty"`
 	Subnet            string            `json:"subnet,omitempty"`
@@ -18,6 +15,7 @@ type EC2InstanceSpec struct {
 	Storage           StorageConfig     `json:"storage,omitempty"`
 	AdditionalStorage []StorageConfig   `json:"additionalStorage,omitempty"`
 	InstanceName      string            `json:"instanceName"`
+	Region            string            `json:"region"`
 }
 
 type StorageConfig struct {

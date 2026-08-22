@@ -2,13 +2,16 @@ package controller
 
 import (
 	"context"
+	webappv1 "github.com/anhour-xyz/kubernetes-ec2-automator/api/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
-
-	webappv1 "github.com/anhour-xyz/kubernetes-ec2-automator/api/v1"
+	"time"
 )
+
+const ec2Finalizer = "webapp.cloud.com/ec2-finalizer"
 
 // EC2InstanceReconciler reconciles an EC2Instance object.
 type EC2InstanceReconciler struct {
@@ -41,13 +44,131 @@ func (r *EC2InstanceReconciler) Reconcile(
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	l.Info(
-		"Reconciling EC2Instance",
-		"name", ec2Instance.Name,
-		"namespace", ec2Instance.Namespace,
+	//Handle Deletion
+	if !ec2Instance.DeletionTimestamp.IsZero() {
+		if !controllerutil.ContainsFinalizer(
+			ec2Instance,
+			ec2Finalizer,
+		) {
+			return ctrl.Result{}, nil
+		}
+
+		if ec2Instance.Status.InstanceID != "" {
+			ec2Client, err := awsClient(
+				ctx,
+				ec2Instance.Spec.Region,
+			)
+
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+
+			if err := deleteEC2Instance(
+				ctx,
+				ec2Client,
+				ec2Instance.Status.InstanceID,
+			); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+
+		controllerutil.RemoveFinalizer(
+			ec2Instance,
+			ec2Finalizer,
+		)
+
+		if err := r.Update(ctx, ec2Instance); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		l.Info(
+			"EC2 instance deleted",
+			"instanceID", ec2Instance.Status.InstanceID,
+		)
+		return ctrl.Result{}, nil
+	}
+
+	// Add finalizer before create external resources
+	if !controllerutil.ContainsFinalizer(
+		ec2Instance,
+		ec2Finalizer,
+	) {
+		controllerutil.AddFinalizer(
+			ec2Instance,
+			ec2Finalizer,
+		)
+
+		if err := r.Update(ctx, ec2Instance); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		return ctrl.Result{Requeue: true}, nil
+	}
+
+	// Create EC2 instance only when no instance ID is recorded
+	if ec2Instance.Status.InstanceID == "" {
+		instanceID, err := createEC2Instance(
+			ctx,
+			ec2Instance,
+			ec2Instance.Spec.Region,
+		)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+
+		ec2Instance.Status.InstanceID = instanceID
+		ec2Instance.Status.Phase = "running"
+
+		if err := r.Status().Update(
+			ctx,
+			ec2Instance,
+		); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		return ctrl.Result{
+			RequeueAfter: 30 * time.Second,
+		}, nil
+	}
+
+	// Check existing EC2 instance
+	exists, instance, err := checkEC2InstanceExists(
+		ctx,
+		ec2Instance.Status.InstanceID,
+		ec2Instance,
 	)
 
-	return ctrl.Result{}, nil
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	phase := "not-found"
+	publicIP := ""
+
+	if exists {
+		if instance.State != nil {
+			phase = string(instance.State.Name)
+		}
+		publicIP = derefString(instance.PublicIpAddress)
+	}
+
+	statusChanged := ec2Instance.Status.Phase != phase || ec2Instance.Status.PublicIP != publicIP
+
+	if statusChanged {
+		ec2Instance.Status.Phase = phase
+		ec2Instance.Status.PublicIP = publicIP
+
+		if err := r.Status().Update(
+			ctx, ec2Instance,
+		); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
+	return ctrl.Result{
+		RequeueAfter: 30 * time.Second,
+	}, nil
+
 }
 
 // SetupWithManager sets up the controller with the Manager.

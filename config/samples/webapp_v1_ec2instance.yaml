@@ -3,11 +3,12 @@ kind: EC2Instance
 metadata:
   name: ec2instance-sample
 spec:
+  region: ap-southeast-1
   instanceName: test-server
   instanceType: t3.small
-  amiID: ami-0123456789abcdef0
-  sshKey: my-key
-  subnet: subnet-0123456789abcdef0
+  amiID: ami-0d247eb021c5394df
+  sshKey: ec2-operator-key
+  subnet: subnet-0dfc41150596eaba5
   tags:
     environment: development
     owner: xinyi
