@@ -2,13 +2,14 @@ package controller
 
 import (
 	"context"
+	"time"
+
 	webappv1 "github.com/anhour-xyz/kubernetes-ec2-automator/api/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
-	"time"
 )
 
 const ec2Finalizer = "webapp.cloud.com/ec2-finalizer"
@@ -44,7 +45,7 @@ func (r *EC2InstanceReconciler) Reconcile(
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	//Handle Deletion
+	// Handle Deletion
 	if !ec2Instance.DeletionTimestamp.IsZero() {
 		if !controllerutil.ContainsFinalizer(
 			ec2Instance,

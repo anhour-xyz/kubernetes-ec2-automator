@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"maps"
+
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -69,9 +71,7 @@ func (in *EC2InstanceSpec) DeepCopyInto(out *EC2InstanceSpec) {
 	if in.Tags != nil {
 		in, out := &in.Tags, &out.Tags
 		*out = make(map[string]string, len(*in))
-		for key, val := range *in {
-			(*out)[key] = val
-		}
+		maps.Copy((*out), *in)
 	}
 	out.Storage = in.Storage
 	if in.AdditionalStorage != nil {

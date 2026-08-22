@@ -3,8 +3,9 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"time"
+
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
 )
 
 func deleteEC2Instance(ctx context.Context,
