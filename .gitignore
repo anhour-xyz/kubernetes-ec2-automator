@@ -24,3 +24,8 @@ go.work
 
 .gocache/
 .tools/.cache/
+
+ec2instance.local.yaml
+*.pem
+.aws/
+get_helm.sh

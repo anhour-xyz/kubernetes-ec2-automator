@@ -1,0 +1,13 @@
+apiVersion: webapp.cloud.com/v1
+kind: ManagedWorkload
+metadata:
+  labels:
+    app.kubernetes.io/name: operator
+    app.kubernetes.io/managed-by: kustomize
+  name: managedworkload-sample
+spec:
+  image: nginx:1.29
+  replicas: 2
+  port: 80
+  env:
+    ENVIRONMENT: development

@@ -2,8 +2,12 @@
 
 ## Overview
 
-Kubernetes EC2 Automator is a Kubernetes Operator that creates, monitors, and deletes AWS EC2 instances through Kubernetes custom resources. It solves the problem of managing EC2 infrastructure separately from Kubernetes by providing a single declarative, Kubernetes-native workflow.
-Users define the desired EC2 configuration in an EC2Instance resource, and the controller automatically reconciles it with AWS while reporting the instance status back to Kubernetes.
+Kubernetes EC2 Automator is a Kubernetes infrastructure operator built with Go and Kubebuilder. It provides two custom resources:
+
+- `EC2Instance` manages the creation, monitoring, and termination of AWS EC2 instances through the AWS SDK for Go.
+- `ManagedWorkload` creates Kubernetes Deployments, monitors workload health, repairs replica drift, and recreates deleted resources.
+
+The project also exposes Prometheus metrics and includes an automated failure-injection suite covering pod deletion, Deployment deletion, and replica drift.
 
 <br>
 
@@ -94,12 +98,29 @@ Users define the desired EC2 configuration in an EC2Instance resource, and the c
 
 ```
 
-## Output
+## Results
 
-![AWS EC2 Infrastructure Provisioned and Health-Validated](image.png)
+![AWS EC2 Instance Provisioned by the Kubernetes Operator](image.png)
 
-1. Developed a Go Kubernetes operator that provisions AWS EC2 instances and synchronizes their instance ID, health state, and network information into custom-resource status.
+The `EC2Instance` controller provisioned an EC2 instance and synchronized its instance ID, state, IP addresses, and DNS information into Kubernetes custom-resource status.
 
+<br>
+
+![Prometheus CPU Monitoring Across 20 Managed Workloads](image-1.png)
+
+Prometheus collected container CPU metrics from 20 workloads distributed across a three-node Kubernetes cluster.
+
+<!-- Add the memory screenshot here. -->
+
+<br>
+
+![Automated Kubernetes Workload Recovery Tests](image-2.png)
+
+The automated failure-injection suite completed **30/30 recovery tests successfully**:
+
+- 10 Pod-deletion scenarios
+- 10 Deployment-deletion scenarios
+- 10 replica-drift scenarios
 
 
 
