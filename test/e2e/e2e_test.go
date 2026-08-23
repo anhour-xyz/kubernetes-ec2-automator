@@ -72,6 +72,31 @@ var _ = Describe("Manager", Ordered, func() {
 		cmd = exec.Command("make", "deploy", fmt.Sprintf("IMG=%s", managerImage))
 		_, err = utils.Run(cmd)
 		Expect(err).NotTo(HaveOccurred(), "Failed to deploy the controller-manager")
+
+		By("waiting for the controller-manager pod to be ready")
+		verifyControllerReady := func(g Gomega) {
+			cmd := exec.Command("kubectl", "get",
+				"pods", "-l", "control-plane=controller-manager",
+				"-o", "go-template={{ range .items }}"+
+					"{{ if not .metadata.deletionTimestamp }}"+
+					"{{ .metadata.name }}"+
+					"{{ \"\\n\" }}{{ end }}{{ end }}",
+				"-n", namespace,
+			)
+			podOutput, err := utils.Run(cmd)
+			g.Expect(err).NotTo(HaveOccurred())
+			podNames := utils.GetNonEmptyLines(podOutput)
+			g.Expect(podNames).To(HaveLen(1), "expected 1 controller pod running")
+
+			// Verify the pod is actually running
+			pod := podNames[0]
+			cmd = exec.Command("kubectl", "get", "pods", pod,
+				"-o", "jsonpath={.status.phase}", "-n", namespace)
+			status, err := utils.Run(cmd)
+			g.Expect(err).NotTo(HaveOccurred())
+			g.Expect(status).To(Equal("Running"), "controller pod not running after deploy")
+		}
+		Eventually(verifyControllerReady, 2*time.Minute, 5*time.Second).Should(Succeed())
 	})
 
 	// After all tests have been executed, clean up by undeploying the controller, uninstalling CRDs,

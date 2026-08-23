@@ -1,5 +1,6 @@
 
 resources:
 - bases/webapp.cloud.com_ec2instances.yaml
+- bases/webapp.cloud.com_managedworkloads.yaml
 
 patches:

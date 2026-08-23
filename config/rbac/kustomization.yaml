@@ -22,6 +22,11 @@ resources:
 # default, aiding admins in cluster management. Those roles are
 # not used by the operator itself. You can comment the following lines
 # if you do not want those helpers be installed with your Project.
+- managedworkload_admin_role.yaml
+- managedworkload_editor_role.yaml
+- managedworkload_viewer_role.yaml
 - ec2instance_admin_role.yaml
 - ec2instance_editor_role.yaml
 - ec2instance_viewer_role.yaml
+
+

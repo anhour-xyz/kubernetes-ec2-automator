@@ -1,0 +1,9 @@
+apiVersion: webapp.cloud.com/v1
+kind: ManagedWorkload
+metadata:
+  name: workload-07
+  namespace: managed-workloads
+spec:
+  image: nginx:1.29
+  replicas: 1
+  port: 80

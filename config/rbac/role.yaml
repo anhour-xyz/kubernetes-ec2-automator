@@ -8,6 +8,7 @@ rules:
   - webapp.cloud.com
   resources:
   - ec2instances
+  - managedworkloads
   verbs:
   - create
   - delete
@@ -20,12 +21,14 @@ rules:
   - webapp.cloud.com
   resources:
   - ec2instances/finalizers
+  - managedworkloads/finalizers
   verbs:
   - update
 - apiGroups:
   - webapp.cloud.com
   resources:
   - ec2instances/status
+  - managedworkloads/status
   verbs:
   - get
   - patch
