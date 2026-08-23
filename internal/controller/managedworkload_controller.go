@@ -2,7 +2,7 @@ package controller
 
 import (
 	"context"
-	"sort"
+	"slices"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -63,7 +63,7 @@ func (r *ManagedWorkloadReconciler) Reconcile(
 		keys = append(keys, key)
 	}
 
-	sort.Strings(keys)
+	slices.Sort(keys)
 
 	for _, key := range keys {
 		env = append(env, corev1.EnvVar{
@@ -144,7 +144,7 @@ func (r *ManagedWorkloadReconciler) Reconcile(
 				}
 			}
 
-			deployment.Spec.Template.ObjectMeta.Labels = labels
+			deployment.Spec.Template.Labels = labels
 			deployment.Spec.Template.Spec.Containers =
 				[]corev1.Container{container}
 

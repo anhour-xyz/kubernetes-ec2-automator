@@ -5,13 +5,18 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
 )
 
+const (
+	namespaceLabel = "namespace"
+	workloadLabel  = "workload"
+)
+
 var (
 	managedWorkloadHealthy = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "managed_workload_healthy",
 			Help: "Whether a managed workload is healthy",
 		},
-		[]string{"namespace", "workload"},
+		[]string{namespaceLabel, workloadLabel},
 	)
 
 	managedWorkloadRecoveries = prometheus.NewCounterVec(
@@ -19,7 +24,7 @@ var (
 			Name: "managed_workload_recoveries_total",
 			Help: "Successful managed workload recoveries",
 		},
-		[]string{"namespace", "workload"},
+		[]string{namespaceLabel, workloadLabel},
 	)
 
 	managedWorkloadRecoveryDuration = prometheus.NewHistogramVec(
@@ -27,7 +32,7 @@ var (
 			Name: "managed_workload_recovery_duration_seconds",
 			Help: "Time required for workload recovery",
 		},
-		[]string{"namespace", "workload"},
+		[]string{namespaceLabel, workloadLabel},
 	)
 )
 
