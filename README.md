@@ -1,4 +1,4 @@
-# Kubernetes EC2 Infrastructure Operator ☁️
+﻿# Kubernetes EC2 Infrastructure Operator ☁️
 
 ## Overview
 
@@ -97,6 +97,33 @@ The project also exposes Prometheus metrics and includes an automated failure-in
                     • AWS IAM
 
 ```
+
+<br>
+
+## API Reference
+
+### ManagedWorkload
+
+| Spec field | Behavior |
+| --- | --- |
+| `image` | Container image for the application. |
+| `replicas` | Desired replica count. The controller restores this value after direct changes to the Deployment. |
+| `port` | A positive port enables HTTP startup, readiness, and liveness probes on `/`. |
+| `env` | Optional map of environment variable names to string values. |
+
+Status includes the `Healthy` or `Recovering` phase, an `Available` condition, ready and available replica counts, and recovery count and timing fields. The controller considers a workload healthy when the number of available replicas meets the desired count. Initial startup can count as a recovery.
+
+### EC2Instance
+
+| Spec field | Behavior |
+| --- | --- |
+| `region` | AWS region used to launch, describe, and terminate the instance. |
+| `amiID` | AMI used to launch the instance. Choose an AMI available in the specified region. |
+| `instanceType` | EC2 instance type passed to the launch request. |
+| `instanceName` | Required by the schema. The launch code currently leaves the EC2 Name tag unset. |
+| `sshKey`, `subnet`, `tags`, `storage`, `additionalStorage` | Declared in the schema. |
+
+<br>
 
 ## Results
 
