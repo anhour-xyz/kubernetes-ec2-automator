@@ -63,6 +63,16 @@ var _ = Describe("Manager", Ordered, func() {
 		_, err = utils.Run(cmd)
 		Expect(err).NotTo(HaveOccurred(), "Failed to label namespace with restricted policy")
 
+		By("building and loading the manager image into the Kind cluster")
+		cmd = exec.Command("make", "docker-build", fmt.Sprintf("IMG=%s", managerImage))
+		_, err = utils.Run(cmd)
+		Expect(err).NotTo(HaveOccurred(), "Failed to build manager image")
+		
+		kindCluster := os.Getenv("KIND_CLUSTER")
+		cmd = exec.Command("kind", "load", "docker-image", managerImage, "--name", kindCluster)
+		_, err = utils.Run(cmd)
+		Expect(err).NotTo(HaveOccurred(), "Failed to load image into Kind cluster")
+
 		By("installing CRDs")
 		cmd = exec.Command("make", "install")
 		_, err = utils.Run(cmd)
